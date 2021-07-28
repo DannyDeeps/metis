@@ -1,0 +1,17 @@
+{
+    "name": "dannydeeps/myphpapp",
+    "authors": [
+        {
+            "name": "Daniel Huggins",
+            "email": "contactdanielhuggins@gmail.com"
+        }
+    ],
+    "require": {
+        "league/plates": "3.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Metis\\": "src/"
+        }
+    }
+}

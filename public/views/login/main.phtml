@@ -1,0 +1,13 @@
+<?php $this->insert('shared::header') ?>
+
+
+<div class="container-fluid mt-2">
+
+    <form action="/login/?attemptLogin" method="post">
+        <input type="text" class="form-control form-control-sm" name="username" required>
+        <input type="password" class="form-control form-control-sm mt-2" name="password" required>
+        <button type="submit" class="btn btn-success mt-2">Login</button>
+    </form>
+
+</div>
+

@@ -1,0 +1,6 @@
+ErrorDocument 404 /404.php
+DirectoryIndex main.php
+
+RewriteEngine On
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteRule ^([^.]+)$ $1.php [L,NC,QSA]

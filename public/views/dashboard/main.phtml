@@ -1,0 +1,8 @@
+<?php $this->insert('shared::header') ?>
+
+<pre><?= $this->e($user, 'print_r') ?></pre>
+<?php foreach ($events as $event): ?>
+    <pre><?= $this->e($event, 'print_r') ?></pre>
+<?php endforeach ?>
+
+<?php $this->insert('shared::footer') ?>
