@@ -1,6 +1,8 @@
 <?php namespace Metis\Errors;
 
-class MetisNotice extends \Exception
+use Metis\System\Session;
+
+class Notice extends \Exception
 {
     /** @var string $icon Fontawesome Icon Element */
     protected $icon= null;
@@ -26,5 +28,10 @@ class MetisNotice extends \Exception
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public static function create(string $message, int $code= 0, \Exception $previous= null, string $status= 'info')
+    {
+        Session::set('notice', new self($message, $code, $previous, $status)); return;
     }
 }

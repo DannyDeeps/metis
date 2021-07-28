@@ -28,10 +28,8 @@
         public function getEventType() { return $this->event_type; }
         public function setEventType($event_type) { $this->event_type = $event_type; return $this; }
 
-        /** @var string $content Event Content */
-        private $content= null;
-        public function getContent() { return $this->content; }
-        public function setContent($content) { $this->content = $content; return $this; }
-
-
+        /** @var string $description Event Description */
+        private $description= null;
+        public function getDescription() { return $this->description; }
+        public function setDescription($description) { $this->description = $description; return $this; }
     }

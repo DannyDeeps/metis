@@ -1,0 +1,17 @@
+<?php $this->insert('shared::header') ?>
+
+<div class="container-fluid">
+    <form method="post">
+        <input type="hidden" name="createEvent">
+        <select name="type" id="type">
+            <?php foreach ($eventTypes as $type): ?>
+                <option value="<?= $type->getId() ?>"><?= $type->getName() ?></option>
+            <?php endforeach ?>
+        </select>
+        <input type="text" name="type_new" id="type-new">
+        <textarea name="description" id="description"></textarea>
+        <button type="submit">save</button>
+    </form>
+</div>
+
+<?php $this->insert('shared::footer') ?>

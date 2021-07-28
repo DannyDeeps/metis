@@ -13,7 +13,5 @@ ready(() => {
         toast.show();
     });
 
-    document.querySelectorAll
-
 
 });

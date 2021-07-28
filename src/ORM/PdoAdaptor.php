@@ -88,13 +88,13 @@ abstract class PdoAdaptor
         if (!empty($fields))
             $select= '`' . implode('`,`', $fields) . '`';
 
+        $where= [];
+        $params= [];
         if (!empty($filters)) {
             if (is_string($filters))
                 $where= "WHERE $filters";
 
             if (is_array($filters)) {
-                $where= [];
-                $params= [];
                 foreach ($filters as $field => $data) {
                     $where[]= "`$field` = :$field";
                     $params[$field]= $data;
@@ -104,7 +104,9 @@ abstract class PdoAdaptor
             }
         }
 
-        $sql= "SELECT $select FROM `$table` $where";
+        $sql= "SELECT $select FROM `$table` ";
+        if (!empty($where))
+            $sql .= $where;
         if (!empty($orderBy))
             $sql .= " ORDER BY $orderBy";
         if (!empty($limitBy))

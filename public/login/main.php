@@ -1,8 +1,8 @@
 <?php require_once '../../includes/start.php';
 
 use Metis\System\{ Login, Util };
-use Metis\Errors\MetisNotice;
 use Metis\Framework\Webpage;
+use Metis\Errors\Notice;
 
 if (Login::userInSession())
     Util::redirect('dashboard');
@@ -13,7 +13,7 @@ if (isset($_REQUEST['attemptLogin'])) {
         Login::attemptLogin($_REQUEST['username'], $_REQUEST['password']);
         Util::redirect('dashboard');
     } catch (\Exception $exc) {
-        $notice= new MetisNotice($exc->getMessage(), $exc->getCode(), $exc, 'danger');
+        $notice= new Notice($exc->getMessage(), $exc->getCode(), $exc, 'danger');
     }
 }
 
