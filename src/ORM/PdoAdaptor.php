@@ -91,8 +91,9 @@ abstract class PdoAdaptor
         $where= [];
         $params= [];
         if (!empty($filters)) {
-            if (is_string($filters))
+            if (is_string($filters)) {
                 $where= "WHERE $filters";
+            }
 
             if (is_array($filters)) {
                 foreach ($filters as $field => $data) {
@@ -177,10 +178,7 @@ abstract class PdoAdaptor
             if (is_array($filters)) {
                 $where= [];
                 foreach ($filters as $field => $data) {
-                    if ($field === 'id')
-                        $where[]= "`$field` = LAST_INSERT_ID(:where_$field)";
-                    else
-                        $where[]= "`$field` = :where_$field";
+                    $where[]= "`$field` = :where_$field";
                     $params["where_$field"]= $data;
                 }
 
@@ -239,6 +237,26 @@ abstract class PdoAdaptor
                 } catch (\Exception $exc2) {}
 
                 return $this->delete($table, $filters);
+            }
+            throw $exc;
+        }
+    }
+
+    public function describeTable(string $table)
+    {
+        $describeTableSql= "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{$this->database}' AND TABLE_NAME = '$table' ORDER BY ORDINAL_POSITION";
+
+        $conn= $this->getConnection();
+        try {
+            $query= $conn->query($describeTableSql);
+            return $query->fetchAll();
+        } catch (\Exception $exc) {
+            if (!empty($exc->errorInfo[1]) && in_array($exc->errorInfo[1], $this->reconnectErrors)) {
+                try {
+                    $this->reconnect();
+                } catch (\Exception $exc2) {}
+
+                return $this->describeTable($table);
             }
             throw $exc;
         }

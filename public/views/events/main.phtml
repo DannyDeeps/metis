@@ -1,9 +1,0 @@
-<?php $this->insert('shared::header') ?>
-
-<div class="container-fluid">
-    <?php foreach ($events as $event): ?>
-        <?= $this->e($event->getContent()) ?>
-    <?php endforeach ?>
-</div>
-
-<?php $this->insert('shared::footer') ?>

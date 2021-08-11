@@ -3,8 +3,7 @@
 use Metis\System\{ Login, Session, Util };
 use Metis\Users\User;
 use Metis\Framework\Webpage;
-use Metis\Events\Event;
-use Metis\Events\Type;
+use Metis\Events\{ Event, Type };
 use Metis\Errors\Notice;
 
 if (!Login::userInSession())

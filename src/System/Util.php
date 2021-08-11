@@ -23,4 +23,9 @@ class Util
         header("Location: $host$url");
         exit;
     }
+
+    public static function pascalToSnake($input)
+    {
+        return ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $input)), '_');
+    }
 }

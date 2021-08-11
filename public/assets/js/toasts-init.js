@@ -12,6 +12,4 @@ ready(() => {
     toastList.forEach(toast => {
         toast.show();
     });
-
-
 });

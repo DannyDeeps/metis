@@ -1,8 +1,8 @@
-<?php namespace Metis\Errors;
+<?php namespace Metis\Exceptions;
 
 use Metis\System\Session;
 
-class Notice extends \Exception
+class NoticeException extends \Exception
 {
     /** @var string $icon Fontawesome Icon Element */
     protected $icon= null;
@@ -32,6 +32,6 @@ class Notice extends \Exception
 
     public static function create(string $message, int $code= 0, \Exception $previous= null, string $status= 'info')
     {
-        Session::set('notice', new self($message, $code, $previous, $status)); return;
+        Session::addNotice(new self($message, $code, $previous, $status)); return;
     }
 }

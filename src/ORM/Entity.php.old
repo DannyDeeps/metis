@@ -1,0 +1,235 @@
+<?php namespace Metis\ORM;
+
+use Metis\Exceptions\ToastException;
+
+abstract class Entity
+{
+    private static $database;
+
+    private static $columns;
+
+    //////////////////////////////////////////////////////////////////////////////
+    //                                                                          //
+    //                              USER FUNCTIONS                              //
+    //                                                                          //
+    //////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Gets a record by its ID
+     *
+     * @param int $id Required. ID of the record.
+     * @return this $entity An entity of extending class.
+     */
+    public static function get(int $id= null)
+    {
+        self::_init();
+
+        $fetch= self::$database->select(static::$_dbTable, [], [ 'id' => $id ], 1);
+
+        $entity= self::morph($fetch);
+
+        return $entity;
+    }
+
+    /**
+     * Find record by given filters
+     *
+     * @param array $filers Optional. Associative array of field and value to filter results by.
+     * @return array $entities An array of entities of the extending class.
+     */
+    public static function find(array $filters= [])
+    {
+        self::_init();
+
+        $entities= [];
+
+        $fetches= self::$database->select(static::$_dbTable, [], $filters);
+        foreach ($fetches as $fetch)
+            $entities[]= self::morph($fetch);
+
+        return $entities;
+    }
+
+    /**
+     * Find one record by given filters
+     *
+     * @param array $filers Optional. Associative array of fields and values to filter results by.
+     * @return array $entities[0] An entity of the extending class.
+     * @throws Exception if more than one record found
+     */
+    public static function findOne(array $filters= [])
+    {
+        self::_init();
+
+        $entities= self::find($filters);
+        if (empty($entities))
+            return null;
+
+        if (count($entities) > 1)
+            throw new ToastException("Found more than one record using findOne method");
+
+        return $entities[0];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    //                                                                          //
+    //                      STATIC FUNCTIONS                                    //
+    //                                                                          //
+    //////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Checks for required static variables ($_dbClass/$_dbTable) that must be defined in extending class, instantiates the database class into a static variable for use with static and non-static functions
+     */
+    private static function initDatabaseClass()
+    {
+        if (empty(static::$_dbClass))
+            throw new ToastException("Missing database class");
+        if (empty(static::$_dbTable))
+            throw new ToastException("Missing database table");
+
+        if (empty(self::$database))
+            self::$database= new static::$_dbClass;
+    }
+
+    /**
+     * Checks for required static variables ($_dbClass/$_dbTable) that must be defined in extending class, instantiates the database class into a static variable for use with static and non-static functions
+     */
+    private static function initColumns()
+    {
+        $columns= [];
+        if (empty(self::$columns))
+        {
+            $columnDescriptions= self::$database->describeTable(static::$_dbTable);
+
+            foreach ($columnDescriptions as $columnDescription)
+            {
+                // Store column information for later use
+                $columns[$columnDescription['COLUMN_NAME']]= new MysqlColumn($columnDescription);
+            }
+
+            self::$columns= $columns;
+        }
+    }
+
+    /**
+     * Main init method other static methods should call first.
+     */
+    private static function _init()
+    {
+        self::initDatabaseClass();
+        self::initColumns();
+    }
+
+    /**
+     * Transforms a database response into an entity of $this class
+     *
+     * @param array $properties Required. Class properties to assign
+     *
+     * @return Entity $entity Returns instance of extending class
+     */
+    private static function morph(array $properties)
+    {
+        $class= get_called_class();
+
+        $entity= new $class;
+
+        foreach ($properties as $property => $value)
+        {
+            $entity->$property= $value;
+        }
+
+        return $entity;
+    }
+
+    /**
+     * Transforms 'Username' into 'username' and 'UserName' into 'user_name'
+     *
+     * @param string $input Pascal case string to transform into snake case
+     */
+    private static function pascalToSnake($input)
+    {
+        return ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $input)), '_');
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    //                                                                          //
+    //                      INSTANTIATED FUNCTIONS                              //
+    //                                                                          //
+    //////////////////////////////////////////////////////////////////////////////
+
+    public function __construct()
+    {
+        self::_init();
+
+        foreach (self::$columns as $columnName => $columnDescription)
+        {
+            $this->$columnName= null;
+        }
+    }
+
+    public function __call(string $methodName, array $args= [])
+    {
+        $mode= null;
+        if (str_starts_with($methodName, 'set'))
+            $mode= 'set';
+        if (str_starts_with($methodName, 'get'))
+            $mode= 'get';
+
+        if (empty($mode))
+            throw new ToastException('Method not recognized');
+
+        $propertyName= self::pascalToSnake(substr($methodName, 3));
+        if (!property_exists($this, $propertyName))
+            throw new ToastException('Property of ' . get_class($this) . "::$$propertyName does not exist");
+
+        switch ($mode)
+        {
+            case 'set':
+                $this->$propertyName= $args[0];
+
+            case 'get':
+                return $this->$propertyName;
+        }
+    }
+
+    public function __set(string $property, mixed $value)
+    {
+        // TODO: validation goes here
+        if (!property_exists($this, $property))
+            throw new ToastException(get_class($this) . '::$' . $property . ' does not exist.');
+
+        $this->$property= $value;
+        return $this;
+    }
+
+    /**
+     * Saves changes to database
+     *
+     * @throws Exception if database operation returns empty result
+     **/
+    public function save() {
+        self::_init();
+
+        $class= new \ReflectionClass($this);
+
+        $dbPacket= [];
+        foreach ($class->getProperties(\ReflectionProperty::IS_PRIVATE) as $property) {
+            $propName= $property->getName();
+            $property->setAccessible(true);
+            $dbPacket[$propName]= $property->getValue($this);
+        }
+
+        if (!empty($this->getId())) {
+            $result= self::$database->update(static::$_dbTable, $dbPacket, [ 'id' => $hasId ]);
+            if (empty($result))
+                throw new ToastException("Failed to update database");
+        } else {
+            $result= self::$database->insert(static::$_dbTable, $dbPacket);
+            if (empty($result))
+                throw new ToastException("Failed to insert to database");
+            $this->setId($result);
+        }
+
+        return $this;
+    }
+}
