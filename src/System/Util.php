@@ -2,25 +2,24 @@
 
 class Util
 {
-    public static function redirect(string $location, string $messageCode= null)
+    public static function redirect(string $location)
     {
         $host= 'http://metis.tools';
-        switch (ENV) {
+        switch (ENV)
+        {
             case 'development': $host= 'http://dev.metis'; break;
             case 'testing': $host= 'http://test.metis'; break;
         }
 
         $url= '';
-        switch ($location) {
+        switch ($location)
+        {
             case 'login': $url= '/login'; break;
             case 'dashboard': $url= '/dashboard'; break;
-            case 'ecents': $url= '/events'; break;
+            case 'events': $url= '/events'; break;
         }
 
-        if (!empty($messageCode))
-            $url .= '&mc=' . urlencode($messageCode);
-
-        header("Location: $host$url");
+        header("Location: {$host}{$url}");
         exit;
     }
 

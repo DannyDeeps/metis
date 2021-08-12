@@ -13,10 +13,4 @@ class User extends \Metis\ORM\Entity
 
     /** @var string $dbTable Database Table */
     protected static $_dbTable= 'users';
-
-// METHODS
-    public function verifyPassword(string $password)
-    {
-        return password_verify($password, $this->password);
-    }
 }

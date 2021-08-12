@@ -1,40 +1,43 @@
 <?php namespace Metis\System;
 
 use Metis\Users\User;
+use Metis\System\Session;
 
 class Login
 {
     public static function userInSession()
     {
-        $detectedUser= (!empty($_SESSION['user_id'])) ? $_SESSION['user_id'] : null;
-        if ($detectedUser)
-            return true;
-        return false;
+        return !empty(Session::get('user_id')) ?? false;
     }
 
     public static function attemptLogin(string $username, string $password)
     {
         if (empty($username) || empty($password))
+        {
             throw new \Exception("All fields required");
+        }
 
-        $user= User::findOne([ 'username' => $username ]);
+        $user= User::findByUsername($username);
         if (empty($user))
+        {
             throw new \Exception("User not found");
+        }
 
-        $verified= $user->verifyPassword($password);
+        $verified= self::verifyPassword($user, $password);
         if (!$verified)
+        {
             throw new \Exception("Incorrect login/password");
+        }
 
-        $_SESSION['user_id']= $user->getId();
+        Session::set('user_id', $user->getId());
     }
 
     public static function hashPassword(string $password)
     {
-        $password= password_hash($password, PASSWORD_BCRYPT);
-        return $password;
+        return password_hash($password, PASSWORD_BCRYPT);
     }
 
-    public function verifyPassword(User $user, string $password)
+    public static function verifyPassword(User $user, string $password)
     {
         return password_verify($password, $user->getPassword());
     }

@@ -10,9 +10,9 @@ class NoticeException extends \Exception
     /** @var string $status Bootstrap Color Class */
     protected $status= null;
 
-    public function __construct(string $message, int $code= 0, \Exception $previous= null, string $status= 'info')
+    public function __construct(\Exception $previous, string $status= 'info')
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($previous->getMessage(), $previous->getCode(), $previous);
 
         $this->icon= '<i class="fas fa-bug"></i>';
         $this->status= $status;
@@ -28,10 +28,5 @@ class NoticeException extends \Exception
     public function getStatus()
     {
         return $this->status;
-    }
-
-    public static function create(string $message, int $code= 0, \Exception $previous= null, string $status= 'info')
-    {
-        Session::addNotice(new self($message, $code, $previous, $status)); return;
     }
 }

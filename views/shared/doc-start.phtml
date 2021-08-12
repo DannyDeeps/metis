@@ -16,7 +16,10 @@
 
 </head>
 <body>
-    <?php if (!empty($notice)): ?>
-        <?php $this->insert('toasts::notice', [ 'notice' => $notice ]) ?>
+    <?php if (!empty($notices)): ?>
+        <?php foreach ($notices as $notice) : ?>
+            <?php $this->insert('toasts::notice', [ 'notice' => $notice ]) ?>
+        <?php endforeach ?>
     <?php endif ?>
+
     <?php $this->insert('shared::footer') ?>

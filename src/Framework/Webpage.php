@@ -1,8 +1,8 @@
 <?php namespace Metis\Framework;
 
-/**
- * undocumented class
- */
+use \Metis\System\Session;
+use \Metis\Users\User;
+
 class Webpage
 {
     private $viewEngine= null;
@@ -48,13 +48,25 @@ class Webpage
         if (!empty($templateData))
             $this->templateData= array_merge($this->templateData, $templateData);
 
-        // die('<pre>' . print_r([
-        //     'template' => $this->template,
-        //     'data' => $this->templateData
-        // ], true) . '</pre>'); // kill
-
+        $this->_loadNotices();
+        $this->_loadUser();
         $this->viewEngine->addData($this->templateData);
         echo $this->viewEngine->render($this->template);
         exit;
+    }
+
+    private function _loadNotices()
+    {
+        $notices= Session::getNotices();
+
+        $this->assignData([ 'notices' => $notices ]);
+        $this->requireJs('toasts-init.js');
+
+        Session::clearNotices();
+    }
+
+    private function _loadUser()
+    {
+        $this->assignData(['user' => User::findById(Session::get('user_id'))]);
     }
 }
