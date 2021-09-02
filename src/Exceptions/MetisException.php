@@ -2,7 +2,7 @@
 
 use Metis\System\Session;
 
-class NoticeException extends \Exception
+class MetisException extends \Exception
 {
     /** @var string $icon Fontawesome Icon Element */
     protected $icon= null;

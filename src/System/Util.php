@@ -1,30 +1,50 @@
-<?php namespace Metis\System;
+<?php
+
+namespace Metis\System;
 
 class Util
 {
-    public static function redirect(string $location)
-    {
-        $host= 'http://metis.tools';
-        switch (ENV)
-        {
-            case 'development': $host= 'http://dev.metis'; break;
-            case 'testing': $host= 'http://test.metis'; break;
-        }
-
-        $url= '';
-        switch ($location)
-        {
-            case 'login': $url= '/login'; break;
-            case 'dashboard': $url= '/dashboard'; break;
-            case 'events': $url= '/events'; break;
-        }
-
-        header("Location: {$host}{$url}");
-        exit;
-    }
-
     public static function pascalToSnake($input)
     {
         return ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $input)), '_');
+    }
+
+    public static function snakeToDisplay($input)
+    {
+        return ucwords(str_replace('_', ' ', strtolower($input)));
+    }
+
+    public static function sanitise(mixed $input)
+    {
+        $filter= self::findFilter($input);
+
+        return filter_var($input, $filter);
+    }
+
+    public static function findFilter(mixed $var)
+    {
+        $type= self::getVarType($var);
+        $filter= match($type) {
+            'string' => FILTER_SANITIZE_STRING,
+
+            default => FILTER_DEFAULT
+
+            // 'boolean',
+            // 'integer',
+            // 'double',
+            // 'object',
+            // 'resource',
+            // 'resource (closed)',
+            // 'array',
+            // 'NULL',
+            // 'unknown type',
+        };
+
+        return $filter;
+    }
+
+    public static function getVarType(mixed $var)
+    {
+        return gettype($var);
     }
 }

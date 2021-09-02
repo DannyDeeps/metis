@@ -1,0 +1,38 @@
+<?php $this->layout('layouts::page') ?>
+
+<form action="">
+    <?php foreach ($formFields as $fieldName => $field): ?>
+        <div class="mb-3">
+            <label
+                class="form-label"
+                for="<?=$this->e($fieldName)?>_input"
+
+            ><?=$this->e($field['display'])?></label>
+
+            <?php if (in_array($field['type'], ['number', 'text', 'checkbox'])): ?>
+                <input
+                    class="form-control"
+                    id="<?=$this->e($fieldName)?>_input"
+
+                    type="<?=$this->e($field['type'])?>"
+                    <?php if (!empty($field['maxLength'])): ?>
+                        maxlength="<?=$this->e($field['maxLength'])?>"
+                    <?php endif ?>
+                    <?php if (!empty($field['required'])): ?>
+                        required
+                    <?php endif ?>
+                >
+            <?php endif ?>
+
+            <?php if (in_array($field['type'], ['textarea'])): ?>
+                <textarea
+                    class="form-control"
+                    id="<?=$this->e($fieldName)?>_input"
+                    <?php if (!empty($field['required'])): ?>
+                        required
+                    <?php endif ?>
+                ></textarea>
+            <?php endif ?>
+        </div>
+    <?php endforeach ?>
+</form>

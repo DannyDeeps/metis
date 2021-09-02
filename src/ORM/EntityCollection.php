@@ -18,9 +18,9 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
     protected $entities;
     protected $position;
 
-    public function __construct(array $entities = [])
+    public function __construct(array $entities= [])
     {
-        $this->entities = $entities;
+        $this->entities= $entities;
     }
 
     /**
@@ -29,9 +29,9 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
      * @return array
      * @return EntityCollection This collection
      */
-    public function setEntities(array $entities = array())
+    public function setEntities(array $entities= [])
     {
-        $this->entities = $entities;
+        $this->entities= $entities;
 
         return $this;
     }
@@ -101,9 +101,9 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
      */
     public function getColumn($name)
     {
-        $results = [];
+        $results= [];
         foreach ($this->entities as $entity) {
-            $results[] = $entity->_get($name);
+            $results[]= $entity->_get($name);
         }
 
         return $results;
@@ -118,9 +118,9 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
      */
     // public function getColumnRaw($name)
     // {
-    //     $results = [];
+    //     $results= [];
     //     foreach ($this->entities as $entity) {
-    //         $results[] = $entity->getRaw($name);
+    //         $results[]= $entity->getRaw($name);
     //     }
 
     //     return $results;
@@ -136,7 +136,7 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
      * @param  bool   $strict use strict comparison when comparing values
      * @return mixed  Entity or NULL
      */
-    public function getOne($column, $value, $strict = true)
+    public function getOne($column, $value, $strict= true)
     {
         if ($strict) {
             foreach ($this->entities as $entity) {
@@ -182,7 +182,7 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
             if ($entity->get($column) === $value) {
                 //remove the entity and reset the keys
                 unset($this->entities[$index]);
-                $this->entities = array_values($this->entities);
+                $this->entities= array_values($this->entities);
 
                 return $entity;
             }
@@ -199,8 +199,8 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
      */
     public function removeRandom()
     {
-        $index = array_rand($this->entities);
-        $entity = $this->entities[$index];
+        $index= array_rand($this->entities);
+        $entity= $this->entities[$index];
         unset($this->entities[$index]);
 
         return $entity;
@@ -266,9 +266,9 @@ class EntityCollection implements IteratorAggregate, Countable, ArrayAccess
             throw new \InvalidArgumentException('Non numeric keys for EntityCollection are forbidden.');
         }
         if (is_null($offset)) {
-            $this->entities[] = $value;
+            $this->entities[]= $value;
         } else {
-            $this->entities[$offset] = $value;
+            $this->entities[$offset]= $value;
         }
     }
 

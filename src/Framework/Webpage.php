@@ -1,7 +1,7 @@
 <?php namespace Metis\Framework;
 
 use \Metis\System\Session;
-use \Metis\Users\User;
+use \Metis\ORM\Models\Users\User;
 
 class Webpage
 {

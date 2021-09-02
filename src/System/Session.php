@@ -1,22 +1,25 @@
-<?php namespace Metis\System;
+<?php
 
-use \Metis\Exceptions\NoticeException;
+namespace Metis\System;
+
+use \Metis\System\{ Util };
+use \Metis\Exceptions\MetisException;
 
 class Session
 {
     public static function get(string $varName)
     {
-        return !empty($_SESSION[$varName]) ? $_SESSION[$varName] : null;
+        return Util::sanitise($_SESSION[$varName] ?? null);
     }
 
     public static function set(string $varName, mixed $value)
     {
-        $_SESSION[$varName]= $value;
+        $_SESSION[$varName]= Util::sanitise($value);
     }
 
-    public static function addNotice(NoticeException $notice)
+    public static function addNotice(MetisException $notice)
     {
-        $notices= self::get('notices') ?? [];
+        $notices= self::get('metis_exceptions') ?? [];
         $notices[]= $notice;
 
         self::set('notices', $notices);
@@ -24,11 +27,11 @@ class Session
 
     public static function getNotices()
     {
-        return self::get('notices') ?? [];
+        return self::get('metis_exceptions') ?? [];
     }
 
     public static function clearNotices()
     {
-        self::set('notices', []);
+        self::set('metis_exceptions', []);
     }
 }

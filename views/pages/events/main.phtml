@@ -1,0 +1,7 @@
+<?php $this->layout('layouts::page') ?>
+
+<div class="container-fluid">
+    <?php foreach ($events as $event): ?>
+        <?=$this->e($event->getDescription())?>
+    <?php endforeach ?>
+</div>

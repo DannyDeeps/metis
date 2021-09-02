@@ -1,44 +1,34 @@
 <?php require_once '../../includes/start.php';
 
-use Metis\System\{ Login, Session, Util };
-use Metis\Users\User;
+use Metis\System\{ Login, Redirect, Session, Request };
 use Metis\Framework\Webpage;
-use Metis\Events\{ Event, Type };
 use Metis\Errors\Notice;
+use Metis\Exceptions\MetisException;
+use Metis\ORM\Models\Users\User;
+use Metis\ORM\Models\Events\{ Event, Type };
 
-if (!Login::userInSession())
-    Util::redirect('login');
+if (!Login::userInSession()) {
+    Redirect::to('login');
+}
 
-$user= User::get($_SESSION['user_id']);
-
-$notice= null;
 if (isset($_REQUEST['createEvent'])) {
     try {
-        $type= (!empty($_REQUEST['type_new'])) ? $_REQUEST['type_new'] : $_REQUEST['type'];
+        $type= (!empty(Request::get('type_new'))) ? Request::get('type_new') : Request::get('type');
 
         $newEvent= new Event;
         $newEvent
-            ->setUserId($user->getId())
+            ->setUserId(Session::get('user_id'))
             ->setEventType($type)
-            ->setDescription($_REQUEST['description'])
-        ->save();
+            ->setDescription(Request::get('description'))
+            ->save();
 
-        Util::redirect('events');
+        Redirect::to('events');
     } catch (Exception $exc) {
-        Notice::create($exc->getMessage(), $exc->getCode(), $exc, 'danger');
+        Session::addNotice(new MetisException($exc, 'danger'));
     }
 }
 
-$webPage= new Webpage($viewEngine, 'events::new', [
-    'title' => 'New Event'
-]);
-
-if (!empty(Session::get('notice'))) {
-    $webPage->requireJs('toasts-init.js');
-    $webPage->assignData([ 'notice' => Session::get('notice') ]);
-}
-
-$webPage->renderPage([
-    'user' => $user,
-    'eventTypes' => Type::find()
-]);
+(new Webpage($viewEngine, 'pages::events/new', [
+    'title' => 'New Event',
+    'formFields' => Event::getFormFields(true)
+]))->renderPage();

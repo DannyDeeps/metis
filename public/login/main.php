@@ -1,25 +1,23 @@
 <?php require_once '../../includes/start.php';
 
-use Metis\System\{ Login, Util, Session };
+use Metis\System\{ Login, Redirect, Session, Request };
 use Metis\Framework\Webpage;
-use Metis\Exceptions\NoticeException;
+use Metis\Exceptions\MetisException;
+use Metis\ORM\Models\Users\User;
 
-if (Login::userInSession())
-    Util::redirect('dashboard');
+if (Login::userInSession()) {
+    Redirect::to('dashboard');
+}
 
-if (isset($_REQUEST['attemptLogin']))
-{
-    try
-    {
-        Login::attemptLogin($_REQUEST['username'], $_REQUEST['password']);
-        Util::redirect('dashboard');
-    }
-    catch (\Exception $exc)
-    {
-        Session::addNotice(new NoticeException($exc, 'danger'));
+if (isset($_REQUEST['attemptLogin'])) {
+    try {
+        Login::attemptLogin(Request::get('username'), Request::get('password'));
+        Redirect::to('dashboard');
+    } catch (\Exception $exc) {
+        Session::addNotice(new MetisException($exc, 'danger'));
     }
 }
 
-(new Webpage($viewEngine, 'login::main', [
+(new Webpage($viewEngine, 'pages::login/main', [
     'title' => 'Login'
 ]))->renderPage();

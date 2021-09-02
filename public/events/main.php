@@ -1,21 +1,16 @@
 <?php require_once '../../includes/start.php';
 
-use Metis\System\{ Login, Util };
-use Metis\Users\User;
+use Metis\System\{ Login, Redirect, Session };
 use Metis\Framework\Webpage;
-use Metis\Events\Event;
+use Metis\ORM\Models\Users\User;
+use Metis\ORM\Models\Events\Event;
 
-if (!Login::userInSession())
-    Util::redirect('login');
+if (!Login::userInSession()) {
+    Redirect::to('login');
+}
 
-$user= User::get($_SESSION['user_id']);
-$events= Event::find([ 'user_id' => $user->getId() ]);
-
-$webPage= new Webpage($viewEngine, 'events::main', [
-    'title' => 'Events'
-]);
-
-$webPage->renderPage([
-    'user' => $user,
-    'events' => $events
-]);
+(new Webpage($viewEngine, 'pages::events/main', [
+    'title' => 'Events',
+    'user' => User::get(Session::get('user_id')),
+    'events' => Event::findAllWhere([ 'user_id' => Session::get('user_id') ])
+]))->renderPage();
