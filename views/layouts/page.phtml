@@ -1,11 +1,15 @@
-<?=$this->insert('shared::doc-start')?>
+<?=$this->insert('framework::doc-start')?>
 
-<?=$this->insert('shared::sidebar')?>
+<aside class="sidebar-wrapper">
 
-<main class="container-fluid">
+    <?=$this->insert('framework::sidebar')?>
 
-    <?=$this->section('content')?>
+    <main class="container-fluid">
 
-</main>
+        <?=$this->section('content')?>
 
-<?=$this->insert('shared::doc-end')?>
+    </main>
+
+</aside>
+
+<?=$this->insert('framework::doc-end')?>

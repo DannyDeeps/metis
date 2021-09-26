@@ -1,38 +1,74 @@
 <?php $this->layout('layouts::page') ?>
 
-<form action="">
-    <?php foreach ($formFields as $fieldName => $field): ?>
-        <div class="mb-3">
-            <label
-                class="form-label"
-                for="<?=$this->e($fieldName)?>_input"
+<ul class="nav nav-tabs">
+    <?php foreach ($allFormFields as $eventType => $formFields): ?>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#<?=$this->e($eventType, 'strtolower')?>-tab">
+                <?=$this->e($eventType, 'pascaltodisplay')?>
+            </button>
+        </li>
+    <?php endforeach ?>
+</ul>
 
-            ><?=$this->e($field['display'])?></label>
+<div class="tab-content p-2">
+    <?php foreach ($allFormFields as $eventType => $formFields): ?>
+        <div class="tab-pane fade" id="<?=$this->e($eventType, 'strtolower')?>-tab" role="tabpanel">
+            <form method="post" class="form">
+                <input type="hidden" name="action" value="create<?=$this->e($eventType)?>">
+                <?php foreach ($formFields as $name => $field): ?>
 
-            <?php if (in_array($field['type'], ['number', 'text', 'checkbox'])): ?>
-                <input
-                    class="form-control"
-                    id="<?=$this->e($fieldName)?>_input"
-
-                    type="<?=$this->e($field['type'])?>"
-                    <?php if (!empty($field['maxLength'])): ?>
-                        maxlength="<?=$this->e($field['maxLength'])?>"
+                    <?php if ($field['type'] === 'text'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/text', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
                     <?php endif ?>
-                    <?php if (!empty($field['required'])): ?>
-                        required
-                    <?php endif ?>
-                >
-            <?php endif ?>
 
-            <?php if (in_array($field['type'], ['textarea'])): ?>
-                <textarea
-                    class="form-control"
-                    id="<?=$this->e($fieldName)?>_input"
-                    <?php if (!empty($field['required'])): ?>
-                        required
+                    <?php if ($field['type'] === 'number'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/number', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
                     <?php endif ?>
-                ></textarea>
-            <?php endif ?>
+
+                    <?php if ($field['type'] === 'date'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/date', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
+                    <?php endif ?>
+
+                    <?php if ($field['type'] === 'time'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/time', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
+                    <?php endif ?>
+
+                    <?php if ($field['type'] === 'datetime-local'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/datetime-local', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
+                    <?php endif ?>
+
+                    <?php if ($field['type'] === 'checkbox'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/checkbox', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
+                    <?php endif ?>
+
+                    <?php if ($field['type'] === 'textarea'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/textarea', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
+                    <?php endif ?>
+
+                    <?php if ($field['type'] === 'select'): ?>
+                        <div class="form-floating mb-3 text-dark">
+                            <?=$this->insert('forms::inputs/select', [ 'name' => $name, 'field' => $field ])?>
+                        </div>
+                    <?php endif ?>
+                <?php endforeach ?>
+
+                <button class="btn btn-sm btn-success" type="submit">Create</button>
+            </form>
         </div>
     <?php endforeach ?>
-</form>
+
+</div>

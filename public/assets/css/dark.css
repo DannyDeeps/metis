@@ -1,0 +1,44 @@
+@import url(fonts/roboto-font.css);
+
+body, html {
+    background-color: var(--bs-dark);
+}
+
+.sidebar-wrapper {
+    display: flex;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    padding: 1rem;
+    color: var(--bs-light);
+    background-color: var(--bs-dark);
+
+    width: 280px;
+}
+
+.sidebar-title {
+    display: flex;
+    align-items: center;
+    color: var(--bs-light);
+    text-decoration: none;
+    margin-bottom: 1rem;
+}
+
+.sidebar .nav-link {
+    color: var(--bs-light);
+}
+
+@media (min-width:576px) {} /* XS */
+
+@media (min-width:768px) {} /* SM */
+
+@media (min-width:992px) {} /* MD */
+
+@media (min-width:1200px) {} /* LG */
+
+@media (min-width:1400px) {} /* XXL */
+
+@media (min-width:1200px) {} /* XL */

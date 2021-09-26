@@ -11,15 +11,12 @@ abstract class Entity
     private $columns;
 
     public function __construct()
-    { // die('constructing.. ');
-
-        if (empty(static::$_dbClass))
-        {
+    {
+        if (empty(static::$_dbClass)) {
             throw new \Exception("Database class not defined");
         }
 
-        if (empty(static::$_dbTable))
-        {
+        if (empty(static::$_dbTable)) {
             throw new \Exception("Database table not defined");
         }
 
@@ -30,8 +27,7 @@ abstract class Entity
 
     private function _initDatabase()
     {
-        if (empty($this->database))
-        {
+        if (empty($this->database)) {
             $this->database= $this->database ?? new static::$_dbClass;
         }
     }
@@ -46,23 +42,23 @@ abstract class Entity
                 $columns[$rawColumn['COLUMN_NAME']]= new MysqlColumn($rawColumn);
             }
 
-            // die('<pre>' . print_r($columns, true) . '</pre>'); // kill
-
             $this->columns= $columns;
         }
     }
 
     private function _initProperties()
     {
-        foreach ($this->columns as $column) {
-            $propName= $column->name;
+        if (empty($this->columns)) {
+            foreach ($this->columns as $column) {
+                $propName= $column->name;
 
-            if (!property_exists($this, $propName)) {
-                $default=
-                    $column->default ??
-                        (($column->nullable === 'YES') ? null : '');
+                if (!property_exists($this, $propName)) {
+                    $default=
+                        $column->default ??
+                            (($column->nullable === 'YES') ? null : '');
 
-                $this->$propName= $default;
+                    $this->$propName= $default;
+                }
             }
         }
     }
@@ -73,17 +69,42 @@ abstract class Entity
 
         $entity= new $entityClass;
 
-        foreach ($this->columns as $column)
-        {
+        foreach ($this->columns as $column) {
             $propName= $column->name;
 
-            if (array_key_exists($propName, $properties))
-            {
+            if (array_key_exists($propName, $properties)) {
                 $entity->_set($propName, $properties[$propName]);
             }
         }
 
         return $entity;
+    }
+
+    private function _antiMorph()
+    {
+        $properties= [];
+
+        foreach ($this->columns as $column)
+        {
+            $propName= $column->name;
+
+            if (!empty($this->$propName)) {
+                $properties[$propName]= $this->$propName;
+            }
+        }
+
+        return $properties;
+    }
+
+    private function getPrimaryKey()
+    {
+        foreach ($this->columns as $column) {
+            if ($column->indexType === 'PRI') {
+                return $column->name;
+            }
+        }
+
+        return null;
     }
 
     public function __call(string $methodName, mixed $args)
@@ -120,7 +141,7 @@ abstract class Entity
         $fetch= $this->database->select(static::$_dbTable, [], [ $propName => $value ]);
 
         if (empty($fetch)) {
-            return null;
+            return;
         }
 
         if (count($fetch) > 1) {
@@ -231,34 +252,40 @@ abstract class Entity
 
         $formFields= [];
         foreach ($entity->columns as $field => $attributes) {
-            if ($attributes->indexType === 'PRI') {
-                continue;
-            }
+            if ($attributes->indexType === 'PRI' ||
+                $attributes->type === 'timestamp'
+            ) { continue; }
 
-            if ($attributes->indexType === 'MUL' && $withSets) {
-                $parent= ucwords(explode('_', $field)[0]) . 's';
-                $class= str_replace(' ', '', Util::snakeToDisplay(str_replace('_id', '', $field)));
-                $relationClass= "\\Metis\\ORM\\Models\\{$parent}\\{$class}";
+            // if ($attributes->indexType === 'MUL' && $withSets) {
+            //     $parent= ucwords(explode('_', $field)[0]) . 's';
+            //     $class= str_replace(' ', '', Util::snakeToDisplay(str_replace('_id', '', $field)));
+            //     $relationClass= "\\Metis\\ORM\\Models\\{$parent}\\{$class}";
 
-                $listSet= $relationClass::getListSet($relationClass);
+            //     $listSet= $relationClass::getListSet($relationClass);
 
-                $formFields[$field]['sets'][strtolower($class)]= $listSet;
-            }
+            //     $formFields[$field]['sets'][strtolower($class)]= $listSet;
+            // }
 
             $formFields[$field]['display']= Util::snakeToDisplay(str_replace('_id', '', $field));
             $formFields[$field]['required']= $attributes->nullable === 'YES' ? !0 : !1;
             $formFields[$field]['maxLength']= $attributes->maxLength;
             $formFields[$field]['type']= match($attributes->type) {
-                'varchar' => 'text',
-                'text' => 'textarea',
-                'int' => 'number',
-                'tinyint' => 'checkbox',
+                'varchar'                                       => 'text',
+                'text'                                          => 'textarea',
+                'tinyint'                                       => 'checkbox',
+                'smallint'                                      => 'time',
+                'int' && str_contains($field, 'date')           => 'date',
+                'int'                                           => 'number',
+                'bigint'                                        => 'datetime-local',
+                'set'                                           => 'select',
 
                 default => null
             };
-        }
 
-        // die('<pre>' . print_r($formFields, true) . '</pre>'); // kill
+            if (!empty($attributes->setList)) {
+                $formFields[$field]['setList']= $attributes->setList;
+            }
+        }
 
         return $formFields;
     }
@@ -284,5 +311,19 @@ abstract class Entity
         // die('<pre>' . print_r($listSet, true) . '</pre>'); // kill
 
         return $listSet;
+    }
+
+    public function save()
+    {
+        $primaryKey= $this->getPrimaryKey();
+
+        if (!empty($this->$primaryKey)) {
+            $this->database->update(static::$_dbTable, $this->_antiMorph(), [ $primaryKey => $this->$primaryKey ]);
+        } else {
+            $autoIncrement= $this->database->insert(static::$_dbTable, $this->_antiMorph());
+            $this->$primaryKey= $autoIncrement;
+        }
+
+        return $this;
     }
 }

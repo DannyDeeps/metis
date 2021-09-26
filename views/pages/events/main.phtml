@@ -2,6 +2,6 @@
 
 <div class="container-fluid">
     <?php foreach ($events as $event): ?>
-        <?=$this->e($event->getDescription())?>
+        <?=$this->insert('tiles::event', [ 'event' => $event ])?>
     <?php endforeach ?>
 </div>

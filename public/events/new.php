@@ -1,34 +1,60 @@
 <?php require_once '../../includes/start.php';
 
-use Metis\System\{ Login, Redirect, Session, Request };
-use Metis\Framework\Webpage;
-use Metis\Errors\Notice;
-use Metis\Exceptions\MetisException;
-use Metis\ORM\Models\Users\User;
-use Metis\ORM\Models\Events\{ Event, Type };
+use Metis\System\{ Login, Redirect, Request };
+use Metis\Framework\{ Webpage, ActionHandler };
+use Metis\Events\Controller;
 
 if (!Login::userInSession()) {
     Redirect::to('login');
 }
 
-if (isset($_REQUEST['createEvent'])) {
-    try {
-        $type= (!empty(Request::get('type_new'))) ? Request::get('type_new') : Request::get('type');
+(new ActionHandler)->registerAction('createStaticEvent',
+    function () {
+        $REQ= Request::getAll();
 
-        $newEvent= new Event;
-        $newEvent
-            ->setUserId(Session::get('user_id'))
-            ->setEventType($type)
-            ->setDescription(Request::get('description'))
-            ->save();
-
-        Redirect::to('events');
-    } catch (Exception $exc) {
-        Session::addNotice(new MetisException($exc, 'danger'));
+        Controller::createStaticEvent(
+            $REQ['name'],
+            $REQ['description'],
+            intval(date('YmdHis', strtotime($REQ['event_time'])))
+        );
     }
-}
+)->registerAction('createTimedEvent',
+    function () {
+        $REQ= Request::getAll();
+
+        Controller::createTimedEvent(
+            $REQ['name'],
+            $REQ['description'],
+            $REQ['time_modifier']
+        );
+    }
+)->registerAction('createScheduledEvent',
+    function () {
+        $REQ= Request::getAll();
+
+        Controller::createScheduledEvent(
+            $REQ['name'],
+            $REQ['description'],
+            $REQ['mode'],
+            $REQ['month_modifier'],
+            $REQ['day_modifier'],
+            intval(date('Hi', strtotime($REQ['time_modifier'])))
+        );
+    }
+)->registerAction('createIntervalEvent',
+    function () {
+        $REQ= Request::getAll();
+
+        Controller::createIntervalEvent(
+            $REQ['name'],
+            $REQ['description'],
+            $REQ['every'],
+            $REQ['start_at']
+        );
+    }
+)->triggerAction();
 
 (new Webpage($viewEngine, 'pages::events/new', [
     'title' => 'New Event',
-    'formFields' => Event::getFormFields(true)
+    'allFormFields' => Controller::getAllFormFields()
 ]))->renderPage();

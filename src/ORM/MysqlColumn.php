@@ -15,6 +15,7 @@ class MysqlColumn
     public $extra;
     public $comment;
     public $expression;
+    public $setList= [];
 
     public function __construct(array $columnRaw)
     {
@@ -31,5 +32,19 @@ class MysqlColumn
         $this->extra=       $columnRaw['EXTRA'] ?? null;
         $this->comment=     $columnRaw['COLUMN_COMMENT'] ?? null;
         $this->expression=  $columnRaw['GENERATION_EXPRESSION'] ?? null;
+
+        if ($this->type === 'set') {
+            $this->setList= $this->_morphSetList($columnRaw['COLUMN_TYPE']);
+        }
+    }
+
+    private function _morphSetList(string $columnType)
+    {
+        $setList= str_replace('set(', '', $columnType);
+        $setList= str_replace(')', '', $setList);
+        $setList= str_replace("'", '', $setList);
+        $setList= explode(',', $setList);
+
+        return $setList;
     }
 }

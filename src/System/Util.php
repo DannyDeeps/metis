@@ -4,6 +4,11 @@ namespace Metis\System;
 
 class Util
 {
+    public static function pascalToDisplay($input)
+    {
+        return implode(' ', preg_split('/(?=[A-Z])/', $input));
+    }
+
     public static function pascalToSnake($input)
     {
         return ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $input)), '_');
@@ -17,7 +22,6 @@ class Util
     public static function sanitise(mixed $input)
     {
         $filter= self::findFilter($input);
-
         return filter_var($input, $filter);
     }
 

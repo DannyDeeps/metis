@@ -9,7 +9,12 @@ class Session
 {
     public static function get(string $varName)
     {
-        return Util::sanitise($_SESSION[$varName] ?? null);
+        $var= $_SESSION[$varName] ?? null;
+        if (!empty($var)) {
+            $var= Util::sanitise($var);
+        }
+
+        return $var;
     }
 
     public static function set(string $varName, mixed $value)

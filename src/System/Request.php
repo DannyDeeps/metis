@@ -2,6 +2,8 @@
 
 namespace Metis\System;
 
+use \Metis\System\Util;
+
 class Request
 {
     public static function get(string $varName)

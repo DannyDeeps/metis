@@ -12,11 +12,13 @@ class Webpage
     const DEF_TEMPLATE_DATA= [
         'title' => 'Metis',
         'css' => [
-            'vendor/bootstrap5.css'
+            'dark',
+            'vendor/bootstrap5'
         ],
         'js' => [
-            'vendor/bootstrap5.js',
-            'vendor/fontawesome5.js'
+            'vendor/jquery3',
+            'vendor/bootstrap5',
+            'vendor/fontawesome5'
         ]
     ];
 
@@ -60,7 +62,7 @@ class Webpage
         $notices= Session::getNotices();
 
         $this->assignData([ 'notices' => $notices ]);
-        $this->requireJs('toasts-init.js');
+        $this->requireJs('toasts/init');
 
         Session::clearNotices();
     }
