@@ -1,4 +1,4 @@
-<?php require_once '../includes/start.php';
+<?php
 
 header('Location: /login');
 exit;

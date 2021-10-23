@@ -1,0 +1,27 @@
+{
+  "name": "metis",
+  "version": "1.0.0",
+  "description": "Life organiser application",
+  "main": "gulpfile.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DannyDeeps/Metis.git"
+  },
+  "author": "Daniel Huggins (contactdanielhuggins@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DannyDeeps/Metis/issues"
+  },
+  "homepage": "https://github.com/DannyDeeps/Metis#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "semantic-ui": "^2.4.2"
+  }
+}

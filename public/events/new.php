@@ -1,12 +1,10 @@
 <?php require_once '../../includes/start.php';
 
 use Metis\System\{ Login, Redirect, Request };
-use Metis\Framework\{ Webpage, ActionHandler };
+use Metis\Framework\{ ViewHandler, ActionHandler };
 use Metis\Events\Controller;
 
-if (!Login::userInSession()) {
-    Redirect::to('login');
-}
+Login::required();
 
 (new ActionHandler)->registerAction('createStaticEvent',
     function () {
@@ -54,7 +52,7 @@ if (!Login::userInSession()) {
     }
 )->triggerAction();
 
-(new Webpage($viewEngine, 'pages::events/new', [
+(new ViewHandler($VIEW_ENGINE, [
     'title' => 'New Event',
     'allFormFields' => Controller::getAllFormFields()
-]))->renderPage();
+]))->renderView('pages/events/new.tpl');

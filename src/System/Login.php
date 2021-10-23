@@ -30,4 +30,11 @@ class Login
 
         Session::set('user_id', $user->getId());
     }
+
+    public static function required()
+    {
+        if (!Login::userInSession()) {
+            Redirect::to('login');
+        }
+    }
 }

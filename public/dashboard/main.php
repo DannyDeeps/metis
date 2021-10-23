@@ -1,12 +1,10 @@
 <?php require_once '../../includes/start.php';
 
-use Metis\System\{ Login, Redirect };
-use Metis\Framework\Webpage;
+use Metis\System\Login;
+use Metis\Framework\ViewHandler;
 
-if (!Login::userInSession()) {
-    Redirect::to('login');
-}
+Login::required();
 
-(new Webpage($viewEngine, 'pages::dashboard/main', [
+(new ViewHandler($VIEW_ENGINE, [
     'title' => 'Dashboard'
-]))->renderPage();
+]))->renderView('pages/dashboard/main.tpl');

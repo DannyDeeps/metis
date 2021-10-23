@@ -1,16 +1,16 @@
 <?php require_once '../../includes/start.php';
 
-use Metis\System\{ Login, Redirect, Session };
-use Metis\Framework\Webpage;
+use Metis\System\{ Login, Session };
+use Metis\Framework\ViewHandler;
 use Metis\Events\Controller;
 use Metis\ORM\Models\Users\User;
 
-if (!Login::userInSession()) {
-    Redirect::to('login');
-}
+Login::required();
 
-(new Webpage($viewEngine, 'pages::events/main', [
+(new ViewHandler($VIEW_ENGINE, [
     'title' => 'Events',
     'user' => User::get(Session::get('user_id')),
-    'events' => Controller::getUserEvents(Session::get('user_id'))
-]))->renderPage();
+    'eventTypes' => Controller::getUserEvents(Session::get('user_id'))
+]))
+    ->requireJs('canvases/event-canvas')
+    ->renderView('pages/events/main.tpl');

@@ -1,16 +1,17 @@
 <?php
-    use Metis\System\Util;
 
-    $viewEngine= new League\Plates\Engine();
-    $viewEngine->setFileExtension('phtml');
+use Metis\System\Util;
 
-    $viewEngine->addFolder('layouts', VIEWS . 'layouts');
-    $viewEngine->addFolder('pages', VIEWS . 'pages');
-    $viewEngine->addFolder('framework', VIEWS . 'framework');
-    $viewEngine->addFolder('tiles', VIEWS . 'tiles');
-    $viewEngine->addFolder('toasts', VIEWS . 'toasts');
-    $viewEngine->addFolder('forms', VIEWS . 'forms');
+$VIEW_ENGINE= new League\Plates\Engine();
+$VIEW_ENGINE->setFileExtension('phtml');
 
-    $viewEngine->registerFunction('pascaltodisplay', function ($input) {
-        return Util::pascalToDisplay($input);
-    });
+$VIEW_ENGINE->addFolder('layouts', VIEWS . 'layouts');
+$VIEW_ENGINE->addFolder('pages', VIEWS . 'pages');
+$VIEW_ENGINE->addFolder('framework', VIEWS . 'framework');
+$VIEW_ENGINE->addFolder('tiles', VIEWS . 'tiles');
+$VIEW_ENGINE->addFolder('toasts', VIEWS . 'toasts');
+$VIEW_ENGINE->addFolder('forms', VIEWS . 'forms');
+
+$VIEW_ENGINE->registerFunction('pascaltodisplay', function ($input) {
+    return Util::pascalToDisplay($input);
+});

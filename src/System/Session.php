@@ -2,8 +2,8 @@
 
 namespace Metis\System;
 
-use \Metis\System\{ Util };
-use \Metis\Exceptions\MetisException;
+use \Metis\System\Util;
+use \Metis\Framework\NoticeHandler;
 
 class Session
 {
@@ -22,9 +22,9 @@ class Session
         $_SESSION[$varName]= Util::sanitise($value);
     }
 
-    public static function addNotice(MetisException $notice)
+    public static function addNotice(NoticeHandler $notice)
     {
-        $notices= self::get('metis_exceptions') ?? [];
+        $notices= self::get('notices') ?? [];
         $notices[]= $notice;
 
         self::set('notices', $notices);
@@ -32,11 +32,11 @@ class Session
 
     public static function getNotices()
     {
-        return self::get('metis_exceptions') ?? [];
+        return self::get('notices') ?? [];
     }
 
     public static function clearNotices()
     {
-        self::set('metis_exceptions', []);
+        self::set('notices', []);
     }
 }

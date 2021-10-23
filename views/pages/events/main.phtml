@@ -1,7 +1,0 @@
-<?php $this->layout('layouts::page') ?>
-
-<div class="container-fluid">
-    <?php foreach ($events as $event): ?>
-        <?=$this->insert('tiles::event', [ 'event' => $event ])?>
-    <?php endforeach ?>
-</div>

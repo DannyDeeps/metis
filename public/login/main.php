@@ -1,23 +1,21 @@
 <?php require_once '../../includes/start.php';
 
-use Metis\System\{ Login, Redirect, Session, Request };
-use Metis\Framework\Webpage;
-use Metis\Exceptions\MetisException;
-use Metis\ORM\Models\Users\User;
+use Metis\System\{ Login, Redirect, Request as Req };
+use Metis\Framework\{ ViewHandler, ActionHandler, NoticeHandler };
 
 if (Login::userInSession()) {
-    Redirect::to('dashboard');
+    Redirect::to('/dashboard');
 }
 
-if (isset($_REQUEST['attemptLogin'])) {
+(new ActionHandler)->registerAction('attemptLogin', function() {
     try {
-        Login::attemptLogin(Request::get('username'), Request::get('password'));
+        Login::attemptLogin(Req::get('username'), Req::get('password'));
         Redirect::to('dashboard');
     } catch (\Exception $exc) {
-        Session::addNotice(new MetisException($exc, 'danger'));
+        (new NoticeHandler($exc, 'danger'))->save();
     }
-}
+})->triggerAction();
 
-(new Webpage($viewEngine, 'pages::login/main', [
+(new ViewHandler($VIEW_ENGINE, [
     'title' => 'Login'
-]))->renderPage();
+]))->renderView('pages/login/main.tpl');

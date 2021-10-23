@@ -1,9 +1,8 @@
-<?php
-    require_once __DIR__.'/../includes/start.php';
+<?php require_once __DIR__.'/../includes/start.php';
 
-    $userRepository = $entityManager->getRepository('User');
-    $users = $userRepository->findAll();
+$userRepository = $entityManager->getRepository('User');
+$users = $userRepository->findAll();
 
-    foreach ($users as $user) {
-        echo sprintf("-%s\n", $user->getDisplayName());
-    }
+foreach ($users as $user) {
+    echo sprintf("-%s\n", $user->getDisplayName());
+}

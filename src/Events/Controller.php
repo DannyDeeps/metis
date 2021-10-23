@@ -6,9 +6,12 @@ use \Metis\ORM\EntityCollection;
 use \Metis\ORM\Models\Events\{
     IntervalEvent, TimedEvent, StaticEvent, ScheduledEvent
 };
+use \Metis\Framework\ViewHandler;
 
 class Controller
 {
+    const CANVAS_TPL= "canvases/event";
+
     public static function getUserEvents(int $user_id)
     {
         $allEvents= [];
@@ -43,8 +46,6 @@ class Controller
             $className= (new \ReflectionClass($eventClass))->getShortName();
             $allFormFields[$className]= $formFields;
         }
-
-        // die('<pre>' . print_r($allFormFields, true) . '</pre>'); // kill
 
         return $allFormFields;
     }
@@ -103,5 +104,12 @@ class Controller
             ->setDayModifier($dayModifier)
             ->setTimeModifier($timeModifier)
             ->save();
+    }
+
+    public static function canvas()
+    {
+        global $VIEW_ENGINE;
+
+        return (new ViewHandler($VIEW_ENGINE))->fetchView(self::CANVAS_TPL);
     }
 }
